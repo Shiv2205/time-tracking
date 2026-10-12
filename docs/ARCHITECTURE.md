@@ -1,5 +1,8 @@
 # Architecture and implementation plan
 
+See [architecture diagrams](ARCHITECTURE_DIAGRAMS.md) for the whole system, backend,
+frontend, data relationships, and submission lifecycle, with links to the source.
+
 ## Runtime
 Vue 3, TypeScript, and Vite build the interface. Go's `net/http` serves its embedded assets and
 same-origin JSON API. SQLite holds drafts and cached reference data. The executable needs no
@@ -14,7 +17,7 @@ Node installation at runtime. Development uses Vite's `/api` proxy to Go.
 6. Run unit, integration, production build, and browser acceptance checks; record results.
 
 ## Storage and data flow
-- Drafts use a local UUID, date, string project/task IDs, integer minutes, billing flag, notes,
+- Drafts use a local random ID, date, string project/task IDs, integer minutes, billing flag, notes,
   revision, status, submission attempt time, error, and optional remote log ID.
 - Cached catalogs retain names/status/ownership. Removed tasks remain visible for historical entries,
   but validation blocks new submission to a task no longer available.
