@@ -1,0 +1,135 @@
+/* Quiet secondary text still needs enough contrast against the light workspace. */
+.muted,
+.subtitle,
+.stat-card p,
+.stat-top,
+.entry-meta,
+.entry-notes,
+.entry-meta .billable,
+.subtle-label,
+.entries-footer,
+.entries-footer strong,
+.inline-add,
+.refresh-button,
+.page-footer,
+.chart-legend,
+.chart-legend small,
+.day-duration,
+.day-name,
+.day-date,
+.report-card p,
+.report-card > small,
+.review-banner p,
+.nav-heading,
+.sidebar-settings,
+.connection-card small,
+.workspace-name small,
+.breadcrumb,
+.local-pill,
+.eyebrow,
+.project-summary > .small,
+.project-summary-total,
+.project-total > div,
+.review-row span,
+.review-row p,
+label small,
+label .optional,
+.report-label,
+.search-field input::placeholder,
+.entry-filters select,
+.this-week {
+  color: #6c7963;
+}
+.status-badge.draft {
+  color: #6b765e;
+}
+.notice {
+  color: #60754e;
+}
+.report-button {
+  color: #5b6c4b;
+}
+.entry-filters select {
+  background-color: #fff;
+}
+.icon-button,
+.entry-actions .icon-button {
+  color: #748267;
+}
+.search-field {
+  flex-direction: row;
+}
+.search-field input {
+  font-size: 11px;
+}
+.entry-meta {
+  font-size: 10px;
+}
+.entry-description strong {
+  font-size: 12px;
+}
+.entry-notes {
+  font-size: 11px;
+}
+.stat-card p {
+  font-size: 11px;
+}
+.stat-top {
+  font-size: 12px;
+}
+.day-duration,
+.day-name,
+.day-date {
+  font-size: 11px;
+}
+.stat-value {
+  font-variant-numeric: tabular-nums;
+}
+.entry-side strong {
+  font-variant-numeric: tabular-nums;
+}
+.bar-track {
+  height: 80px;
+}
+.bar {
+  min-height: 2px;
+}
+.entry-filters .search-field input {
+  padding-left: 31px;
+  min-height: 36px;
+  height: 36px;
+}
+.mobile-nav,
+.mobile-settings {
+  display: none;
+}
+@media (max-width: 760px) {
+  .mobile-settings {
+    display: inline-flex;
+  }
+}
+@media (max-width: 480px) {
+  .mobile-nav {
+    display: flex;
+    gap: 4px;
+    padding: 8px 12px;
+    background: white;
+    border-bottom: 1px solid var(--line);
+  }
+  .mobile-nav button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    flex: 1;
+    padding: 9px 5px;
+    font-size: 10px;
+    color: #6c7963;
+    background: none;
+    border-radius: 6px;
+  }
+  .mobile-nav button.active {
+    background: #edf3e7;
+    color: var(--green);
+  }
+}
