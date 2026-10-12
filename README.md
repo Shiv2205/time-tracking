@@ -108,5 +108,6 @@ Never copy over a running SQLite database. OAuth credentials are tied to the Win
 - [Agent guide](AGENTS.md)
 - [Product requirements](docs/REQUIREMENTS.md)
 - [Architecture and implementation plan](docs/ARCHITECTURE.md)
+- [Architecture diagrams](docs/ARCHITECTURE_DIAGRAMS.md)
 - [Verification and validation](docs/VALIDATION.md)
 - [Zoho API integration](docs/ZOHO.md)

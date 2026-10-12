@@ -35,6 +35,29 @@ Real OAuth and write acceptance require the user's client credentials and a perm
 portal. Do not claim live integration validation from mocked or demo results. Start with one deliberate
 test entry and verify its user, task, date, duration, billing flag, and notes directly in Zoho.
 
+## Architecture documentation checks
+
+For [issue #1](https://github.com/Shiv2205/time-tracking/issues/1), check the
+[architecture diagrams](ARCHITECTURE_DIAGRAMS.md) against the linked source and
+the requirements/Zoho contract. Verify every relative link and navigation anchor;
+lint each Mermaid fence, then render and inspect all diagrams. Confirm that labels,
+boundaries, and arrow styles convey meaning without relying on color. Preview the
+Markdown on GitHub before merging because its renderer can differ from other hosts.
+
+Checked on 2026-10-12:
+
+| Check | Evidence |
+| --- | --- |
+| Source accuracy | Compared startup, Go HTTP/workflows/model/store/vault/Zoho adapter, and Vue App/dialogs/API/helper source with all five diagrams. |
+| Static validation | Mermaid Diagrams skill imported five fences and linted them with no diagnostics. Imported raw canonical JSON was checked against the applicable v2 schema constraints. These checks are not a full Mermaid parse. |
+| Local references | All 53 relative links in README, architecture notes, diagrams, and this validation document resolve; diagram navigation anchors resolve. |
+| Rendering | All five final diagram sources rendered in Mermaid Live Editor, which reported Mermaid v12.1.0. Layouts, labels, and arrow directions were inspected; long frontend labels were shortened. This is renderer evidence, not GitHub host acceptance. |
+| Whitespace | Documentation whitespace checks and `git diff --check` passed. |
+| GitHub preview | Pending: the browser preview requires GitHub sign-in. Verify the final Markdown in GitHub's preview before merging. |
+
+Application tests were not rerun for this documentation-only change; the recorded
+application validation below is unchanged.
+
 ## Results
 Verified on 2026-10-11 using Windows, Go 1.27.2, Node 24.13.1, and Playwright Chromium.
 
