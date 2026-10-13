@@ -16,6 +16,9 @@ Node installation at runtime. Development uses Vite's `/api` proxy to Go.
 ## Storage and data flow
 - Drafts use a local UUID, date, string project/task IDs, integer minutes, billing flag, notes,
   revision, status, submission attempt time, error, and optional remote log ID.
+- Vue formats repeatable comment sections into the existing plain-text notes field. On draft edit,
+  it parses complete sections from the end of the notes, leaving any earlier freeform text intact.
+  Unchanged notes are submitted to draft storage verbatim. No schema or API payload change is needed.
 - Cached catalogs retain names/status/ownership. Removed tasks remain visible for historical entries,
   but validation blocks new submission to a task no longer available.
 - Existing logs are keyed by remote ID and date; refresh replaces a fetched week's cache atomically.

@@ -5,6 +5,7 @@
   draft/report totals, SQLite persistence, revisions, catalog membership, and submission recovery.
 - `go vet ./...`: Go static checks.
 - `npm test --prefix web`: duration and date helpers and report-facing frontend behavior.
+  Comment tests cover section formatting, reopening, appending after freeform notes, and validation.
 - `npm run build --prefix web`: TypeScript checking and production Vue build.
 - `npm run test:e2e --prefix web`: start isolated normal and demo servers and test first-run setup, draft CRUD,
   weekly review selection, copyable report, explicit submission, reference logs, and mobile layout.
@@ -29,6 +30,8 @@ the entry stays locked as uncertain across restart. Test zero, one, and multiple
 8. Confirm submitted entries disappear from draft totals/reports and remain visible in history.
 9. Inspect existing Zoho logs separately; they never inflate local draft totals.
 10. Keyboard navigation, accessible labels, clear feedback, and a usable narrow viewport work.
+11. Add a formatted comment, edit its brief after reopening the draft, append another comment,
+    and confirm the plain-text layout survives reload and appears in the project report.
 
 ## Live acceptance prerequisite
 Real OAuth and write acceptance require the user's client credentials and a permitted Zoho Projects
@@ -64,3 +67,11 @@ task-only request, then retains only the current user's logs.
 Live OAuth and real Zoho reads/writes have **not** been exercised with the user's credentials.
 Complete the live acceptance described above and in [Zoho integration](ZOHO.md) before relying on
 the app for a real weekly submission, especially the duration format and any required custom fields.
+
+## Time-entry comment change (2026-10-13)
+The formatted comment feature adds no new Zoho API field. Its generated text uses the existing
+notes field. Frontend unit tests (7), the production Vue build, Go tests, Go vet, and the source
+formatting check passed on Windows. All three browser acceptance scenarios passed with the updated
+executable, including comment editing, appending, reload, report rendering, and narrow layout.
+Submitted entries remain read-only. Live Zoho submission of these notes still requires the
+credentialed acceptance described above.

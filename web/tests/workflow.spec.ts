@@ -51,8 +51,32 @@ test('draft workflow, report, deliberate submission, and reference separation', 
     page.getByText('Browser acceptance: reviewed the test cases.', { exact: false }),
   ).toBeVisible()
   await page.getByRole('button', { name: 'Edit Quality assurance' }).click()
-  await page.getByRole('dialog').getByLabel('Duration').fill('1.5')
+  const edit = page.getByRole('dialog', { name: 'Edit time entry' })
+  await edit.getByLabel('Duration').fill('1.5')
+  await edit.getByRole('button', { name: 'Add comment' }).click()
+  await edit.getByLabel('Comment 1 header').fill('Browser testing')
+  await edit
+    .getByRole('textbox', { name: 'Comment 1 brief point 1' })
+    .fill('Reviewed the test cases')
+  await edit.getByRole('button', { name: '+ Add brief point' }).click()
+  await edit.getByRole('textbox', { name: 'Comment 1 brief point 2' }).fill('Checked the report')
+  await edit.getByLabel('Comment 1 duration in hours').fill('1.5')
+  await expect(edit.locator('.comment-preview')).toContainText(
+    'Browser testing:\nBrief:\n- Reviewed the test cases\n- Checked the report\nDuration: 1.5',
+  )
   await page.getByRole('button', { name: 'Save draft' }).click()
+  await page.reload()
+  await page.getByRole('button', { name: 'Edit Quality assurance' }).click()
+  const again = page.getByRole('dialog', { name: 'Edit time entry' })
+  await expect(again.getByLabel('Comment 1 header')).toHaveValue('Browser testing')
+  await again
+    .getByRole('textbox', { name: 'Comment 1 brief point 2' })
+    .fill('Checked the project report')
+  await again.getByRole('button', { name: 'Add comment' }).click()
+  await again.getByLabel('Comment 2 header').fill('Follow-up')
+  await again.getByRole('textbox', { name: 'Comment 2 brief point 1' }).fill('Verified the fix')
+  await again.getByLabel('Comment 2 duration in hours').fill('0.5')
+  await again.getByRole('button', { name: 'Save draft' }).click()
   await page.getByRole('button', { name: 'Duplicate Quality assurance' }).click()
   await page.getByRole('dialog').getByLabel('Work notes').fill('Temporary duplicate to remove.')
   await page.getByRole('button', { name: 'Save draft' }).click()
@@ -64,6 +88,10 @@ test('draft workflow, report, deliberate submission, and reference separation', 
   const report = page.getByRole('dialog', { name: 'Weekly project report' })
   await report.getByLabel('Project', { exact: true }).selectOption('northstar')
   await expect(report.getByLabel('Report preview')).toHaveValue(/Kept notes verbatim\./)
+  await expect(report.getByLabel('Report preview')).toHaveValue(/Checked the project report/)
+  await expect(report.getByLabel('Report preview')).toHaveValue(
+    /Follow-up:\nBrief:\n- Verified the fix\nDuration: 0.5/,
+  )
   await expect(report.getByLabel('Report preview')).toHaveValue(/Total: 7:00 hours/)
   await page.context().grantPermissions(['clipboard-read', 'clipboard-write'])
   await report.getByRole('button', { name: 'Copy report' }).click()
@@ -108,6 +136,16 @@ test('week navigation and mobile layout stay usable', async ({ page }) => {
     .getByRole('dialog')
     .getByLabel('Work notes')
     .fill('Small screen check: reviewed onboarding notes.')
+  await page.getByRole('dialog').getByRole('button', { name: 'Add comment' }).click()
+  await page.getByRole('dialog').getByLabel('Comment 1 header').fill('Mobile review')
+  await page
+    .getByRole('dialog')
+    .getByRole('textbox', { name: 'Comment 1 brief point 1' })
+    .fill('Checked the narrow layout')
+  await page.getByRole('dialog').getByLabel('Comment 1 duration in hours').fill('0.75')
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+    true,
+  )
   await page.getByRole('button', { name: 'Save draft' }).click()
   await expect(page.getByText('Small screen check: reviewed onboarding notes.')).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
