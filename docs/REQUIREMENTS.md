@@ -21,6 +21,10 @@ The target integration is **Zoho Projects v3**, not the separate Zoho ERP Projec
     Include dates, tasks, durations, notes, and project total. Copy it before submitting those drafts.
 11. Allow refreshing Zoho data and show connection status and the last successful refresh time.
 12. Keep a clearly labeled demo mode with separate storage and simulated submission.
+13. Let users compose optional work notes as repeatable formatted comment sections: a header,
+    one or more brief bullet points, and a positive decimal-hour duration. Generate the plain-text
+    `Header:\nBrief:\n- point\nDuration: hours` layout automatically. Local drafts can reopen
+    these sections for editing and append additional sections while retaining earlier notes.
 
 ## Defaults and boundaries
 - Local-only server, bound to `127.0.0.1:8080`; no multi-user account system.
@@ -28,6 +32,9 @@ The target integration is **Zoho Projects v3**, not the separate Zoho ERP Projec
 - Time entry accepts `H:MM` or decimal hours and stores integer minutes without floating-point totals.
 - Billable status is explicitly visible and editable; new drafts default to non-billable.
 - Notes are plain text, preserved verbatim, with Zoho's documented 10,000-character maximum.
+- Freeform notes remain available. Formatted sections are stored in the same notes string and
+  appear in reports and Zoho submissions without a separate remote field. Section durations
+  describe the comment breakdown; the entry duration remains an independently edited value.
 - Reports are generated deterministically from user notes; no AI rewriting or email delivery.
 - Submitted Zoho entries are viewed, not edited or deleted, through this application.
 - Creating OAuth credentials and granting API access are setup prerequisites.

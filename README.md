@@ -39,6 +39,10 @@ ask its Zoho administrator for an allowed client and the necessary project/time-
 ## Daily workflow
 - Add an entry with its date, project, task, duration, billable status, and optional notes.
 - Enter `1:30` or `1.5` for 90 minutes. Durations must represent whole minutes.
+- Use **Add comment** to fill in a header, brief points, and decimal hours. Tempo formats them
+  as plain-text work notes. Reopen a local draft to edit a comment or append another. The comment
+  durations describe the breakdown; update the entry duration separately when your work grows.
+- The **Work notes** box accepts freeform text, including older notes, before formatted comments.
 - Drafts save on this computer. Use the project filter or daily bars to focus the week.
 - Generate and copy project reports **before submission**; reports contain current drafts only.
 - Click **Review entries**, select drafts, and confirm to submit. Successes move to Submitted time.
