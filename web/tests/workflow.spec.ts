@@ -27,7 +27,7 @@ test('draft workflow, report, deliberate submission, and reference separation', 
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Your week, at a glance' })).toBeVisible()
   await expect(page.getByText('DEMO', { exact: true })).toBeVisible()
-  await expect(page.locator('.entry-row')).toHaveCount(4)
+  await expect(page.locator('.entries-panel .entry-row')).toHaveCount(4)
   await expect
     .poll(async () => (await page.locator('.bar').first().boundingBox())?.height || 0)
     .toBeGreaterThan(10)
@@ -159,4 +159,72 @@ test('week navigation and mobile layout stay usable', async ({ page }) => {
   await page.getByRole('button', { name: 'Add time', exact: true }).click()
   await page.keyboard.press('Escape')
   await expect(page.getByRole('dialog')).not.toBeVisible()
+})
+
+test('past-week dashboard separates Zoho totals and renders HTML notes as text', async ({
+  page,
+}) => {
+  await page.goto('/')
+  await page.route('**/api/week?start=*', async (route) => {
+    const response = await route.fetch()
+    const week = await response.json()
+    const log = (
+      id: string,
+      projectId: string,
+      projectName: string,
+      minutes: number,
+      billable: boolean,
+      notes: string,
+    ) => ({
+      id,
+      date: week.start,
+      projectId,
+      projectName,
+      taskId: 'api',
+      taskName: 'API integration',
+      userId: 'you',
+      minutes,
+      billable,
+      notes,
+      createdAt: '2026-10-01T12:00:00Z',
+      approval: 'Approved',
+    })
+    week.logs = [
+      log(
+        'past-1',
+        'northstar',
+        'Northstar platform',
+        90,
+        true,
+        '<p>API work:<br>Brief:<br>- Reviewed &amp; shipped<br>Duration: 1.5</p><script>unsafe()</script>',
+      ),
+      log(
+        'past-2',
+        'portal',
+        'Client portal',
+        30,
+        false,
+        '<ul><li>Planning</li><li>Review</li></ul>',
+      ),
+      log('past-3', 'portal', 'Client portal', 60, false, 'Plain notes stay plain.'),
+    ]
+    await route.fulfill({ response, json: week })
+  })
+  await page.getByRole('button', { name: 'Previous week' }).click()
+  const summary = page.getByRole('region', { name: 'Zoho time summary' })
+  await expect(summary).toContainText('3h')
+  await expect(summary).toContainText(/2\s*projects/)
+  await expect(summary.locator('.submitted-breakdown')).toContainText(
+    /Billable\s*1h 30m\s*Non-billable\s*1h 30m/,
+  )
+  const logs = page.getByRole('region', { name: 'Submitted Zoho logs' })
+  await expect(logs.locator('.entry-row')).toHaveCount(3)
+  await expect(logs).toContainText(/API work:\s*Brief:\s*- Reviewed & shipped\s*Duration: 1.5/)
+  await expect(logs).toContainText(/- Planning\s*- Review/)
+  await expect(logs).not.toContainText('unsafe()')
+  await expect(logs.locator('script')).toHaveCount(0)
+  await page.getByRole('combobox', { name: 'Filter by project' }).selectOption('portal')
+  await expect(summary).toContainText('1h 30m')
+  await expect(summary).toContainText(/1\s*projects/)
+  await expect(logs.locator('.entry-row')).toHaveCount(2)
 })

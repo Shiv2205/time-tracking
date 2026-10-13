@@ -460,6 +460,41 @@ h1 {
   gap: 17px;
   margin-bottom: 23px;
 }
+.submitted-overview-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.submitted-overview-heading h2 {
+  font-size: 13px;
+}
+.submitted-overview-heading span {
+  color: #929b87;
+  font-size: 10px;
+}
+.submitted-breakdown {
+  margin: 7px 0 0;
+  display: grid;
+  gap: 4px;
+}
+.submitted-breakdown > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 5px;
+}
+.submitted-breakdown dt {
+  color: #929b87;
+  font-size: 10px;
+}
+.submitted-breakdown dd {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 570;
+  white-space: nowrap;
+}
 .stat-card {
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -550,6 +585,10 @@ h1 {
   background: #6d9270;
   border-radius: 2px;
 }
+.chart-legend > .zoho-legend-dot {
+  background: #8494af;
+  margin-left: 8px;
+}
 .chart-legend small {
   font-size: 9px;
   color: #b1b5a8;
@@ -584,6 +623,7 @@ h1 {
 .bar-track {
   display: flex;
   align-items: flex-end;
+  gap: 2px;
   height: 63px;
   width: 100%;
   max-width: 83px;
@@ -593,10 +633,14 @@ h1 {
 }
 .bar {
   display: block;
-  width: 100%;
+  width: 50%;
   border-radius: 4px 4px 0 0;
   background: #cbdcc0;
   transition: height 0.25s;
+}
+.bar.zoho-bar,
+.day-column.today .bar.zoho-bar {
+  background: #8494af;
 }
 .day-column.today .bar {
   background: #7fa179;
@@ -625,6 +669,9 @@ h1 {
   grid-template-columns: minmax(0, 1fr) 272px;
   gap: 23px;
   align-items: start;
+}
+.dashboard-logs {
+  margin-top: 24px;
 }
 .entries-heading {
   padding: 22px 22px 18px;
@@ -1759,6 +1806,15 @@ input[type='checkbox'] {
   }
 }
 @media (max-width: 480px) {
+  .submitted-breakdown > div {
+    display: block;
+  }
+  .submitted-breakdown dt {
+    font-size: 8px;
+  }
+  .submitted-breakdown dd {
+    font-size: 16px;
+  }
   .sidebar {
     display: none;
   }

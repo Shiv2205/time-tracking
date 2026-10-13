@@ -14,9 +14,13 @@ The target integration is **Zoho Projects v3**, not the separate Zoho ERP Projec
 5. Keep drafts across app and computer restarts. Show save and error feedback.
 6. Default to the current Monday–Sunday week in the browser's local timezone; allow other weeks.
 7. Weekly review contains local drafts only, with totals by date, project, and the full week.
+   The weekly overview separately summarizes cached Zoho time logs by total time, project,
+   billable and non-billable time, and day; these logs never enter draft review totals.
 8. Submit only selected entries after explicit review and confirmation. Display per-entry success,
    failure, and uncertain status. Submitted entries become read-only and retain their Zoho ID.
-9. Show existing Zoho logs in a separate reference view. Exclude them from draft review totals.
+9. Show existing Zoho logs in a separate reference view and as read-only entries on the weekly
+   overview. Render HTML-formatted Zoho notes as readable plain text without displaying HTML.
+   Exclude these logs from draft review totals and reports.
 10. Generate a copyable plain-text report for a selected project and week from current drafts only.
     Include dates, tasks, durations, notes, and project total. Copy it before submitting those drafts.
 11. Allow refreshing Zoho data and show connection status and the last successful refresh time.

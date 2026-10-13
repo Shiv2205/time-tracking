@@ -2,7 +2,8 @@
 
 A local Vue + Go application for preparing your weekly Zoho Projects time entries.
 Keep task-based drafts with work notes, review the week, copy a project report, and explicitly
-submit selected drafts to Zoho. Existing Zoho time logs are available in a separate reference view.
+submit selected drafts to Zoho. The weekly overview shows submitted Zoho time separately from
+drafts; existing logs also have a dedicated reference view.
 
 ## Run the built application
 The Windows executable is generated at `dist/timetracker.exe`. Start it in PowerShell:
@@ -48,7 +49,9 @@ ask its Zoho administrator for an allowed client and the necessary project/time-
 - Click **Review entries**, select drafts, and confirm to submit. Successes move to Submitted time.
 - Failed entries can be edited. An uncertain submission stays locked: use **Check**, inspect the
   matching Zoho log, and either link it or explicitly release it after confirming no entry exists.
-- Zoho time logs are a reference view and are excluded from all draft totals and reports.
+- Navigate to an earlier week and use **Refresh Zoho** to load its logs. The weekly overview shows
+  submitted totals, projects, billable and non-billable hours, daily bars, and read-only notes.
+  Zoho time remains separate from draft totals and reports. HTML notes appear as readable text.
 
 ## Build and develop
 Requirements: Go **1.26 or newer**, Node **22.12 or newer**, and npm. A downloaded Go toolchain
