@@ -25,6 +25,10 @@ Node installation at runtime. Development uses Vite's `/api` proxy to Go.
 - Cached catalogs retain names/status/ownership. Removed tasks remain visible for historical entries,
   but validation blocks new submission to a task no longer available.
 - Existing logs are keyed by remote ID and date; refresh replaces a fetched week's cache atomically.
+- The weekly overview reads the same cached Zoho logs as the reference view. Vue computes separate
+  submitted totals and project/day breakdowns without combining them with local draft totals.
+  Remote notes are converted from HTML to plain text in the browser and rendered through Vue's
+  escaped text interpolation; raw provider markup is never inserted into the DOM.
 - Settings contain portal/user IDs, timezone, region, and sync time. Secrets live separately.
 - Windows protects the secret file with DPAPI; other platforms use a private file with mode 0600.
 - Database backup downloads contain drafts and cache only. Disconnect removes OAuth secrets and

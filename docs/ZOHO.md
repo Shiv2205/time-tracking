@@ -40,6 +40,8 @@ Some documented responses are bare arrays; those use short-page termination.
 The adapter decodes numbers as `json.Number` to preserve large IDs.
 Time-log list responses group records by date under `time_logs[].log_details[]`.
 User IDs are verified again locally to keep other people's logs out of the reference view.
+Zoho notes can contain HTML. The adapter preserves their returned text in the cache; the browser
+converts supported block and list markup to readable plain text for both the overview and reference view.
 If Zoho returns HTTP 500 for the documented assignee filter, the adapter repeats that read
 without the filter, keeping the week and task-module bounds. It checks owner IDs locally before
 storing logs and uses the unfiltered form for later reads in the same process.

@@ -32,6 +32,9 @@ the entry stays locked as uncertain across restart. Test zero, one, and multiple
 10. Keyboard navigation, accessible labels, clear feedback, and a usable narrow viewport work.
 11. Add a formatted comment, edit its brief after reopening the draft, append another comment,
     and confirm the plain-text layout survives reload and appears in the project report.
+12. Navigate to a past week, refresh its Zoho logs, and confirm the overview separately shows
+    submitted total time, project count/breakdown, billable and non-billable time, daily bars,
+    and read-only notes. HTML notes display as text with their line and list structure.
 
 ## Live acceptance prerequisite
 Real OAuth and write acceptance require the user's client credentials and a permitted Zoho Projects
@@ -98,3 +101,10 @@ formatting check passed on Windows. All three browser acceptance scenarios passe
 executable, including comment editing, appending, reload, report rendering, and narrow layout.
 Submitted entries remain read-only. Live Zoho submission of these notes still requires the
 credentialed acceptance described above.
+
+## Zoho dashboard change (2026-10-13)
+Frontend tests (7), the production Vue build, Go tests, Go vet, and source formatting checks
+passed on Windows. The rebuilt executable passed all four Playwright scenarios, including a
+past-week dashboard with multiple projects, billable and non-billable logs, HTML notes, and
+project filtering. The rendered desktop dashboard was inspected. The past-week browser scenario
+uses intercepted Zoho-shaped logs; real portal data and live HTML variants remain unverified.

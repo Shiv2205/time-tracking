@@ -18,6 +18,7 @@ import ReviewDialog from './components/ReviewDialog.vue'
 import ReportDialog from './components/ReportDialog.vue'
 import ConnectionDialog from './components/ConnectionDialog.vue'
 import ReconcileDialog from './components/ReconcileDialog.vue'
+import RemoteLogRow from './components/RemoteLogRow.vue'
 
 const bootstrap = ref<Bootstrap>(),
   week = ref<Week>(),
@@ -59,6 +60,18 @@ const visibleHistory = computed(() =>
   (week.value?.entries || []).filter((e) => e.status === 'submitted' && matching(e)),
 )
 const visibleLogs = computed(() => (week.value?.logs || []).filter(matching))
+const fullSubmittedMinutes = computed(() =>
+  (week.value?.logs || []).reduce((sum, log) => sum + log.minutes, 0),
+)
+const submittedMinutes = computed(() =>
+  visibleLogs.value.reduce((sum, log) => sum + log.minutes, 0),
+)
+const submittedBillableMinutes = computed(() =>
+  visibleLogs.value.filter((log) => log.billable).reduce((sum, log) => sum + log.minutes, 0),
+)
+const submittedProjectCount = computed(
+  () => new Set(visibleLogs.value.map((log) => log.projectId)).size,
+)
 const totalMinutes = computed(() => visiblePending.value.reduce((sum, e) => sum + e.minutes, 0))
 const billableMinutes = computed(() =>
   visiblePending.value.filter((e) => e.billable).reduce((sum, e) => sum + e.minutes, 0),
@@ -72,18 +85,39 @@ const projectTotals = computed(() => {
   }
   return [...totals.values()].sort((a, b) => b.minutes - a.minutes)
 })
+const submittedProjectTotals = computed(() => {
+  const totals = new Map<string, Total>()
+  for (const log of week.value?.logs || []) {
+    const total = totals.get(log.projectId) || {
+      key: log.projectId,
+      name: log.projectName,
+      minutes: 0,
+    }
+    total.minutes += log.minutes
+    totals.set(log.projectId, total)
+  }
+  return [...totals.values()].sort((a, b) => b.minutes - a.minutes)
+})
 const days = computed(() =>
   Array.from({ length: 7 }, (_, i) => {
     const date = shiftDate(start.value, i)
-    const minutes = pending.value
+    const draftMinutes = pending.value
       .filter(
         (e) => e.date === date && (!projectFilter.value || e.projectId === projectFilter.value),
       )
       .reduce((sum, e) => sum + e.minutes, 0)
-    return { date, minutes }
+    const logMinutes = (week.value?.logs || [])
+      .filter(
+        (log) =>
+          log.date === date && (!projectFilter.value || log.projectId === projectFilter.value),
+      )
+      .reduce((sum, log) => sum + log.minutes, 0)
+    return { date, draftMinutes, logMinutes }
   }),
 )
-const maxDay = computed(() => Math.max(480, ...days.value.map((d) => d.minutes)))
+const maxDay = computed(() =>
+  Math.max(480, ...days.value.flatMap((d) => [d.draftMinutes, d.logMinutes])),
+)
 const ready = computed(() => bootstrap.value?.connected && !!bootstrap.value.settings.userId)
 const initials = computed(() =>
   (bootstrap.value?.settings.userName || 'Your workspace')
@@ -119,6 +153,7 @@ function notify(message: string) {
 async function loadWeek() {
   const request = ++loadNumber
   loading.value = true
+  week.value = undefined
   try {
     const result = await api<Week>(`/week?start=${start.value}`)
     if (request === loadNumber) week.value = result
@@ -457,12 +492,60 @@ onMounted(async () => {
           </article>
         </section>
 
-        <section class="week-chart panel" aria-label="Daily draft hours">
+        <section class="submitted-overview" aria-label="Zoho time summary">
+          <div class="submitted-overview-heading">
+            <h2>Submitted Zoho time</h2>
+            <span>Read only · refreshed for the selected week</span>
+          </div>
+          <div class="stats">
+            <article class="stat-card">
+              <div class="stat-top">
+                <span>Total logged</span>
+                <Icon name="clock" :size="19" />
+              </div>
+              <div class="stat-value">{{ hoursLabel(submittedMinutes) }}</div>
+              <p>
+                {{ visibleLogs.length }} {{ visibleLogs.length === 1 ? 'log' : 'logs' }} from Zoho
+              </p>
+            </article>
+            <article class="stat-card">
+              <div class="stat-top">
+                <span>Projects worked on</span>
+                <Icon name="folder" :size="19" />
+              </div>
+              <div class="stat-value">
+                {{ submittedProjectCount }}
+                <span class="stat-unit">projects</span>
+              </div>
+              <p>Based on submitted Zoho logs</p>
+            </article>
+            <article class="stat-card">
+              <div class="stat-top">
+                <span>Billable / non-billable</span>
+                <Icon name="check" :size="19" />
+              </div>
+              <dl class="submitted-breakdown">
+                <div>
+                  <dt>Billable</dt>
+                  <dd>{{ hoursLabel(submittedBillableMinutes) }}</dd>
+                </div>
+                <div>
+                  <dt>Non-billable</dt>
+                  <dd>{{ hoursLabel(submittedMinutes - submittedBillableMinutes) }}</dd>
+                </div>
+              </dl>
+            </article>
+          </div>
+        </section>
+
+        <section class="week-chart panel" aria-label="Daily draft and Zoho hours">
           <div class="panel-heading">
             <h2>Your week in focus</h2>
             <span class="chart-legend">
               <span />
               Draft hours
+              <span class="zoho-legend-dot" />
+              Zoho hours
               <small>· Monday–Sunday</small>
             </span>
           </div>
@@ -472,16 +555,26 @@ onMounted(async () => {
               :key="d.date"
               class="day-column"
               :class="{ today: d.date === today(), chosen: dayFilter === d.date }"
-              :aria-label="`${weekday(d.date)} ${shortDate(d.date)}, ${hoursLabel(d.minutes)}. Filter entries`"
+              :aria-label="`${weekday(d.date)} ${shortDate(d.date)}, ${hoursLabel(d.draftMinutes)} drafts and ${hoursLabel(d.logMinutes)} Zoho logs. Filter entries`"
               :aria-pressed="dayFilter === d.date"
               @click="dayFilter = dayFilter === d.date ? '' : d.date"
             >
-              <span class="day-duration">{{ d.minutes ? hoursLabel(d.minutes) : '—' }}</span>
+              <span class="day-duration">
+                {{
+                  d.draftMinutes || d.logMinutes ? hoursLabel(d.draftMinutes + d.logMinutes) : '—'
+                }}
+              </span>
               <span class="bar-track">
                 <span
                   class="bar"
                   :style="{
-                    height: `${d.minutes ? Math.max(6, (d.minutes / maxDay) * 100) : 3}%`,
+                    height: `${d.draftMinutes ? Math.max(6, (d.draftMinutes / maxDay) * 100) : 3}%`,
+                  }"
+                />
+                <span
+                  class="bar zoho-bar"
+                  :style="{
+                    height: `${d.logMinutes ? Math.max(6, (d.logMinutes / maxDay) * 100) : 3}%`,
                   }"
                 />
               </span>
@@ -646,27 +739,7 @@ onMounted(async () => {
                 <h3>No reference logs for this week</h3>
                 <p>Refresh Zoho to fetch your existing task time logs.</p>
               </div>
-              <div v-for="log in visibleLogs" :key="log.id" class="entry-row">
-                <div class="entry-project-icon" :style="{ color: projectColor(log.projectId) }">
-                  <Icon name="link" />
-                </div>
-                <div class="entry-description">
-                  <strong>{{ log.taskName }}</strong>
-                  <div class="entry-meta">
-                    {{ log.projectName }}
-                    <i />
-                    {{ shortDate(log.date) }}
-                    <i />
-                    {{ log.billable ? 'Billable' : 'Non-billable' }}
-                  </div>
-                  <p class="entry-notes">{{ log.notes }}</p>
-                  <small class="muted">Zoho ID {{ log.id }}</small>
-                </div>
-                <div class="entry-side">
-                  <strong>{{ hoursLabel(log.minutes) }}</strong>
-                  <span class="status-badge submitted">{{ log.approval || 'Logged' }}</span>
-                </div>
-              </div>
+              <RemoteLogRow v-for="log in visibleLogs" :key="log.id" :log="log" />
             </template>
             <template v-else>
               <div v-if="!visibleHistory.length" class="empty-state">
@@ -744,6 +817,40 @@ onMounted(async () => {
                 <strong>{{ hoursLabel(week?.minutes || 0) }}</strong>
               </div>
             </section>
+            <section class="project-summary panel" aria-label="Zoho time by project">
+              <div class="panel-heading">
+                <h2>Zoho time by project</h2>
+                <Icon name="link" :size="17" />
+              </div>
+              <p class="muted small">Submitted logs across the full week</p>
+              <div v-if="!submittedProjectTotals.length" class="small muted project-summary-empty">
+                Refresh Zoho for this week to see submitted projects.
+              </div>
+              <button
+                v-for="p in submittedProjectTotals"
+                :key="p.key"
+                class="project-total"
+                @click="chooseProject(p.key)"
+              >
+                <div>
+                  <span class="project-dot" :style="{ background: projectColor(p.key) }" />
+                  <strong>{{ p.name }}</strong>
+                  <span>{{ hoursLabel(p.minutes) }}</span>
+                </div>
+                <span class="project-progress">
+                  <span
+                    :style="{
+                      width: `${(p.minutes / (fullSubmittedMinutes || 1)) * 100}%`,
+                      background: projectColor(p.key),
+                    }"
+                  />
+                </span>
+              </button>
+              <div class="project-summary-total">
+                <span>Submitted total</span>
+                <strong>{{ hoursLabel(fullSubmittedMinutes) }}</strong>
+              </div>
+            </section>
             <section class="report-card">
               <span class="report-symbol"><Icon name="report" :size="22" /></span>
               <h2>
@@ -760,6 +867,25 @@ onMounted(async () => {
             </section>
           </aside>
         </div>
+        <section
+          v-if="view === 'drafts'"
+          class="dashboard-logs panel"
+          aria-label="Submitted Zoho logs"
+        >
+          <div class="panel-heading entries-heading">
+            <h2>
+              Submitted Zoho logs
+              <span class="count-badge">{{ visibleLogs.length }}</span>
+            </h2>
+            <span class="subtle-label">Read only · from Zoho</span>
+          </div>
+          <div v-if="!visibleLogs.length && !loading" class="empty-state">
+            <Icon name="link" :size="28" />
+            <h3>No Zoho logs for this week</h3>
+            <p>Use Refresh Zoho to load the selected week.</p>
+          </div>
+          <RemoteLogRow v-for="log in visibleLogs" :key="log.id" :log="log" />
+        </section>
         <section v-if="view === 'drafts'" class="review-banner">
           <span class="review-check"><Icon name="check" :size="21" /></span>
           <div>
