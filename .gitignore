@@ -1,6 +1,7 @@
 /.tools/
 /.cache/
 /dist/
+/cmd/timetracker/*.syso
 /web/dist/*
 !/web/dist/.gitkeep
 /web/node_modules/

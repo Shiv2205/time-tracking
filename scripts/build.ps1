@@ -11,6 +11,8 @@ try {
     }
     npm run build --prefix web
     if ($LASTEXITCODE -ne 0) { throw 'Frontend build failed.' }
+    & $goExecutable run github.com/tc-hib/go-winres@v0.3.3 simply --arch amd64,arm64 --manifest none --icon internal/icon/favicon.ico --out cmd/timetracker/rsrc
+    if ($LASTEXITCODE -ne 0) { throw 'Windows icon generation failed.' }
     New-Item -ItemType Directory -Force dist | Out-Null
     & $goExecutable build -o dist/timetracker.exe ./cmd/timetracker
     if ($LASTEXITCODE -ne 0) { throw 'Go build failed.' }
